@@ -40,6 +40,8 @@ void MYMODBUS_Init(int baudrate)
 void MYMODBUS_Manage(void) {
 	(void) eMBPoll();
 	usRegInputBuf[0]++;
+	usRegInputBuf[1] = 666;
+	usRegInputBuf[2] = 69;
 }
 
 eMBErrorCode

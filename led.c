@@ -13,14 +13,14 @@ void LED_Init(void) {
 }
 
 void LED_On(uint8_t led) {
-//	LED_PORT |= led;
+	LED_PORT |= led;
 }
 
 void LED_Off(uint8_t led) {
-//	LED_PORT &= ~led;
+	LED_PORT &= ~led;
 }
 
 void LED_Toggle(uint8_t led) {
-//	LED_PORT ^= led;
+	LED_PORT ^= led;
 }
 

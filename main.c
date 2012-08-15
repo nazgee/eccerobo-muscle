@@ -24,13 +24,16 @@ int main(void)
 	LED_PORT = 0;
 
 //	UART_Init(75);
-	MYMODBUS_Init(19200);
+	MYMODBUS_Init(4800);
 //	sei();
 	//UDR = 0;
 
+	int skipper = 0;
 	while (1) {
+		skipper++;
+		if (skipper % 1000 == 0)
+			LED_Toggle(LED_IDLE);
 		MYMODBUS_Manage();
-		LED_Toggle(LED_IDLE);
 //		_delay_ms(1);
 	}
 	return 0;

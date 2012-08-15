@@ -123,21 +123,28 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
 BOOL
 xMBPortSerialPutByte( CHAR ucByte )
 {
-	LED_Toggle(LED_UDRE);
     UDR = ucByte;
     return TRUE;
 }
 
+static int skipper = 0;
 BOOL
 xMBPortSerialGetByte( CHAR * pucByte )
 {
+	skipper++;
     *pucByte = UDR;
-	LED_PORT = *pucByte;
+//	if ((skipper % 4) == 0)
+//		LED_PORT = UBRRH;
+//	else if ((skipper % 4) == 1)
+//		LED_PORT = UBRRL;
+//	else
+//		LED_PORT = *pucByte;
     return TRUE;
 }
 
 ISR( USART_UDRE_vect )
 {
+	LED_Toggle(LED_UDRE);
     pxMBFrameCBTransmitterEmpty(  );
 }
 
