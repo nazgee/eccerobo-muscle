@@ -1,0 +1,9 @@
+*.o
+*.out
+*.lst
+*.obj
+.project
+.cproject
+*.hex
+*.elf
+*.map
