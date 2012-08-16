@@ -6,9 +6,14 @@
  */
 #include <avr/io.h>
 #include "led.h"
+#include <util/delay.h>
 
 void LED_Init(void) {
 	LED_DDR = 0xFF;
+	for (int i=0; i<8; i++) {
+		LED_On(_BV(i));
+		_delay_ms(100);
+	}
 	LED_PORT = 0;
 }
 

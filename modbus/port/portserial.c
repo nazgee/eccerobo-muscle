@@ -133,12 +133,6 @@ xMBPortSerialGetByte( CHAR * pucByte )
 {
 	skipper++;
     *pucByte = UDR;
-//	if ((skipper % 4) == 0)
-//		LED_PORT = UBRRH;
-//	else if ((skipper % 4) == 1)
-//		LED_PORT = UBRRL;
-//	else
-//		LED_PORT = *pucByte;
     return TRUE;
 }
 

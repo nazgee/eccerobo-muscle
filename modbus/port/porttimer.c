@@ -38,13 +38,11 @@
 
 /* ----------------------- Static variables ---------------------------------*/
 static USHORT   usTimerOCRADelta;
-static USHORT   usTimerOCRBDelta;
 
 /* ----------------------- Start implementation -----------------------------*/
 BOOL
 xMBPortTimersInit( USHORT usTim1Timerout50us )
 {
-	LED_Toggle(LED_DUMMY1);
     vMBPortTimersDisable(  );
 
     /* Calculate overflow counter an OCR values for Timer1. */
@@ -60,17 +58,13 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
 }
 
 
-//static int toggler_enable = 0;
 inline void
 vMBPortTimersEnable(  )
 {
-//	toggler_enable++;
-//	if ((toggler_enable % 7) == 0)
-		LED_Toggle(LED_DUMMY2);
     TCNT1 = 0x0000;
     if( usTimerOCRADelta > 0 )
     {
-    	// enable T1 OVF interrupt
+    	// enable interrupt
         TIMSK |= _BV( OCIE1A );
         OCR1A = usTimerOCRADelta;
     }
@@ -79,13 +73,9 @@ vMBPortTimersEnable(  )
     TCCR1B |= _BV( CS11 );
 }
 
-//static int toggler_disable = 0;
 inline void
 vMBPortTimersDisable(  )
 {
-//	toggler_disable++;
-//	if ((toggler_disable % 7) == 0)
-		LED_Toggle(LED_DUMMY3);
     /* Disable the timer by disabling clock */
     TCCR1B &= ~( _BV( CS12 ) | _BV( CS11 ) | _BV( CS10 ) );
     /* Disable interrupt */
@@ -94,12 +84,10 @@ vMBPortTimersDisable(  )
     TIFR |= _BV( OCF1A ) ;
 }
 
-//static int toggler_timer = 0;
 ISR( TIMER1_COMPA_vect )
 {
-//	toggler_timer++;
-//	if ((toggler_timer % 5) == 0)
-		LED_Toggle(LED_TIMER);
+	LED_Toggle(LED_TIMER);
+
     ( void )pxMBPortCBTimerExpired(  );
 }
 
