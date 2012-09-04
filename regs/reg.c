@@ -9,7 +9,7 @@
 #include "reg.h"
 #include "defines.h"
 
-struct {
+static struct {
 	reg_ptr_t registers[REGISTERS_NUMBER];
 } reg;
 
