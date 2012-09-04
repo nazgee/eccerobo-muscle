@@ -14,6 +14,7 @@
 #include "mbport.h"
 
 #include "regs/reg.h"
+#include "motor/motor.h"
 
 /* ----------------------- Defines ------------------------------------------*/
 #define REG_INPUT_START 1000
@@ -23,37 +24,60 @@
 static USHORT   usRegInputStart = REG_INPUT_START;
 static USHORT   usRegInputBuf[REG_INPUT_NREGS];
 
-eMBErrorCode reg_RW( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
+eMBErrorCode reg_Motor1( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
+eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
 
 static reg_t r1 = {
 		.id = 500,
 		.value = 69,
-		.handler = reg_RW
+		.handler = reg_Motor1
 };
 
 static reg_t r2 = {
 		.id = 501,
 		.value = 666,
-		.handler = reg_RW
+		.handler = reg_Motor2
 };
 /* ----------------------- Start implementation -----------------------------*/
 
 eMBErrorCode reg_RW( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode ) {
 	switch (eMode) {
-	case MB_REG_READ: {
-		*pucRegBuffer++ = ( unsigned char )( reg->value >> 8 );
-		*pucRegBuffer++ = ( unsigned char )( reg->value & 0xFF );
-	} break;
-	case MB_REG_WRITE:
-	default: {
-		reg->value = ((reg_val_t)pucRegBuffer[0] << 8) | pucRegBuffer[1];
-	} break;
+		case MB_REG_READ: {
+			*pucRegBuffer++ = ( unsigned char )( reg->value >> 8 );
+			*pucRegBuffer++ = ( unsigned char )( reg->value & 0xFF );
+		} break;
+		case MB_REG_WRITE:
+		default: {
+			reg->value = ((reg_val_t)pucRegBuffer[0] << 8) | pucRegBuffer[1];
+		} break;
 	}
 	return MB_ENOERR;
 }
 
+eMBErrorCode reg_Motor( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode, enum eMotor eMotor ) {
+	reg_RW(reg, pucRegBuffer, eMode);
+
+	switch (eMode) {
+		case MB_REG_WRITE: {
+			MOTOR_Set(eMotor, reg->value);
+		} break;
+		default:
+			break;
+	}
+	return MB_ENOERR;
+}
+
+eMBErrorCode reg_Motor1( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode ) {
+	return reg_Motor(reg, pucRegBuffer, eMode, MOTOR1);
+}
+
+eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode ) {
+	return reg_Motor(reg, pucRegBuffer, eMode, MOTOR2);
+}
+
 void MYMODBUS_Init(int baudrate)
 {
+	MOTOR_Init();
 	REG_Register(&r1);
 	REG_Register(&r2);
 

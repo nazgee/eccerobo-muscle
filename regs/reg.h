@@ -16,7 +16,7 @@
 typedef struct reg reg_t;
 typedef reg_t* reg_ptr_t;
 
-typedef         eMBException( *regHandler ) ( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
+typedef         eMBErrorCode( *regHandler ) ( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
 typedef uint16_t reg_id_t;
 typedef uint16_t reg_val_t;
 struct reg {
@@ -28,6 +28,8 @@ struct reg {
 //typedef reg_t* reg_ptr_t;
 
 void REG_Register(reg_ptr_t reg2register);
+eMBErrorCode REG_Handle( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
+                 eMBRegisterMode eMode );
 
 
 #endif /* REG_H_ */
