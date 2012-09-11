@@ -100,6 +100,8 @@ MBSRC = 	modbus/mb.c \
 			modbus/functions/mbutils.c 
 PRJSRC=main.c mymodbus.c led.c $(MBPORTSRC) $(MBSRC) \
 			regs/reg.c \
+			pwm/pwm.c \
+			pwm/mypwm.c \
 			motor/motor.c
  
 # additional includes (e.g. -I/path/to/mydir)
