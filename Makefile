@@ -66,7 +66,7 @@
 # (e.g. 'at90s8515', see the available avr-gcc mmcu 
 # options for possible values)
 MCU=atmega16
-FREQ=1000000UL
+FREQ=8000000UL
 # id to use with programmer
 # default: PROGRAMMER_MCU=$(MCU)
 # In case the programer used, e.g avrdude, doesn't
@@ -100,7 +100,7 @@ MBSRC = 	modbus/mb.c \
 			modbus/functions/mbutils.c 
 PRJSRC=main.c mymodbus.c led.c $(MBPORTSRC) $(MBSRC) \
 			regs/reg.c \
-			pwm/mypwm.c \
+			pwm/pwm.c \
 			motor/motor.c
  
 # additional includes (e.g. -I/path/to/mydir)

@@ -32,62 +32,51 @@
 #include "mbport.h"
 
 /* ----------------------- Defines ------------------------------------------*/
-#define MB_TIMER_PRESCALER      ( 8UL )
-//#define MB_TIMER_TICKS          ( F_CPU / MB_TIMER_PRESCALER )
-#define MB_50US_TICKS           ( 6UL )
+#define TICKS_PER_50US           ( 6 ) // how many ticks 50us lasts
 
 /* ----------------------- Static variables ---------------------------------*/
-static USHORT   usTimerOCRADelta;
+static USHORT   number_of_50us_periods;
 
 /* ----------------------- Start implementation -----------------------------*/
 BOOL
-xMBPortTimersInit( USHORT usTim1Timerout50us )
-{
-    vMBPortTimersDisable(  );
+ xMBPortTimersInit(USHORT is50usTimeouts) {
+	vMBPortTimersDisable();
 
-    /* Calculate overflow counter an OCR values for Timer1. */
-    usTimerOCRADelta = usTim1Timerout50us * MB_50US_TICKS;
+	// set CTC mode
+	TCCR2 |= (_BV( WGM21 ));
+	OCR2 = TICKS_PER_50US * is50usTimeouts;
 
-    // clear WGM bits
-    TCCR1A &=  ~( _BV( WGM11 ) | _BV( WGM10 ));
-    TCCR1B &=  ~( _BV( WGM13 ) | _BV( WGM12 ));
-    // set CTC mode
-    TCCR1B |=  ( _BV( WGM12 ));
-
-    return TRUE;
+	return TRUE;
 }
 
 
 inline void
 vMBPortTimersEnable(  )
-{
-    TCNT1 = 0x0000;
-    if( usTimerOCRADelta > 0 )
-    {
-    	// enable interrupt
-        TIMSK |= _BV( OCIE1A );
-        OCR1A = usTimerOCRADelta;
-    }
+ {
+	TCNT2 = 0x00;
 
-    // set prescaler to enable clock
-    TCCR1B |= _BV( CS11 );
+	// enable interrupt
+	TIMSK |= _BV( OCIE2 );
+
+	// set prescaler to enable clock
+	TCCR2 |= _BV( CS22 ) ; // prescaler = 64
 }
 
 inline void
 vMBPortTimersDisable(  )
 {
-    /* Disable the timer by disabling clock */
-//    TCCR1B &= ~( _BV( CS12 ) | _BV( CS11 ) | _BV( CS10 ) );
+    /* Stop the timer by disabling clock */
+    TCCR2 &= ~( _BV( CS22 ) | _BV( CS21 ) | _BV( CS20 ) );
     /* Disable interrupt */
-    TIMSK &= ~( _BV( OCIE1A ) );
+    TIMSK &= ~( _BV( OCIE2 ) );
     /* Clear interrupt flag */
-    TIFR |= _BV( OCF1A ) ;
+    TIFR |= _BV( OCF2 );
 }
 
-ISR( TIMER1_COMPA_vect )
+ISR( TIMER2_COMP_vect )
 {
-	LED_Toggle(LED_TIMER);
+//	LED_Toggle(LED_TIMER);
+	( void )pxMBPortCBTimerExpired();
 
-    ( void )pxMBPortCBTimerExpired(  );
 }
 

@@ -138,13 +138,11 @@ xMBPortSerialGetByte( CHAR * pucByte )
 
 ISR( USART_UDRE_vect )
 {
-	LED_Toggle(LED_UDRE);
     pxMBFrameCBTransmitterEmpty(  );
 }
 
 ISR( USART_RXC_vect )
 {
-	LED_Toggle(LED_RX);
     pxMBFrameCBByteReceived(  );
 }
 

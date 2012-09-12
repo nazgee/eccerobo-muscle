@@ -75,7 +75,7 @@ eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eM
 	return reg_Motor(reg, pucRegBuffer, eMode, MOTOR2);
 }
 
-void MYMODBUS_Init(int baudrate)
+void MYMODBUS_Init(unsigned long baudrate)
 {
 	MOTOR_Init();
 	REG_Register(&r1);

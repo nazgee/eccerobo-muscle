@@ -12,9 +12,9 @@
 
 #define LED_DDR DDRA
 #define LED_PORT PORTA
-#define LED_TIMER _BV(7)
-#define LED_RX _BV(6)
-#define LED_UDRE _BV(5)
+#define LED_DUMMY7 _BV(7)
+#define LED_DUMMY6 _BV(6)
+#define LED_DUMMY5 _BV(5)
 #define LED_DUMMY4 _BV(4)
 #define LED_DUMMY3 _BV(3)
 #define LED_DUMMY2 _BV(2)
