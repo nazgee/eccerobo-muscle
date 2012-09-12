@@ -77,7 +77,7 @@ inline void
 vMBPortTimersDisable(  )
 {
     /* Disable the timer by disabling clock */
-    TCCR1B &= ~( _BV( CS12 ) | _BV( CS11 ) | _BV( CS10 ) );
+//    TCCR1B &= ~( _BV( CS12 ) | _BV( CS11 ) | _BV( CS10 ) );
     /* Disable interrupt */
     TIMSK &= ~( _BV( OCIE1A ) );
     /* Clear interrupt flag */
