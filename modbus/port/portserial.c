@@ -127,22 +127,22 @@ xMBPortSerialPutByte( CHAR ucByte )
     return TRUE;
 }
 
-static int skipper = 0;
 BOOL
 xMBPortSerialGetByte( CHAR * pucByte )
 {
-	skipper++;
     *pucByte = UDR;
     return TRUE;
 }
 
 ISR( USART_UDRE_vect )
 {
+//	LED_Toggle(_BV(1));
     pxMBFrameCBTransmitterEmpty(  );
 }
 
 ISR( USART_RXC_vect )
 {
+//	LED_Toggle(_BV(2));
     pxMBFrameCBByteReceived(  );
 }
 

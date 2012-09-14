@@ -35,7 +35,6 @@
 #define TICKS_PER_50US           ( 6 ) // how many ticks 50us lasts
 
 /* ----------------------- Static variables ---------------------------------*/
-static USHORT   number_of_50us_periods;
 
 /* ----------------------- Start implementation -----------------------------*/
 BOOL
@@ -59,7 +58,7 @@ vMBPortTimersEnable(  )
 	TIMSK |= _BV( OCIE2 );
 
 	// set prescaler to enable clock
-	TCCR2 |= _BV( CS22 ) ; // prescaler = 64
+	TCCR2 |= _BV( CS22 ) ; // prescaler = 64, 8us at 8MHz per tick
 }
 
 inline void
@@ -75,7 +74,7 @@ vMBPortTimersDisable(  )
 
 ISR( TIMER2_COMP_vect )
 {
-//	LED_Toggle(LED_TIMER);
+//	LED_Toggle(_BV(0));
 	( void )pxMBPortCBTimerExpired();
 
 }

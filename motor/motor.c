@@ -9,6 +9,7 @@
 #include <avr/portpins.h>
 #include "motor.h"
 #include "../led.h"
+#include "../pwm/pwm.h"
 
 #define SFR2PTR(x) (uint8_t*)_SFR_ADDR(x)
 
@@ -21,6 +22,8 @@ struct motor_pin {
 struct motor {
 	struct motor_pin pin1;
 	struct motor_pin pin2;
+	uint8_t pwm;
+	motor_value_t value;
 };
 
 struct module {
@@ -56,22 +59,42 @@ struct module this = {
 	}
 };
 
+void pwm_StartHandler ( void* userdata ) {
+	struct motor* motor = (struct motor*)userdata;
+	if (motor->value < 0) {
+		*motor->pin1.port |= ( motor->pin1.pin);
+	} else {
+		*motor->pin2.port |= ( motor->pin2.pin);
+	}
+
+}
+
+void pwm_CycleHandler ( void* userdata ) {
+	struct motor* motor = (struct motor*)userdata;
+
+	*motor->pin1.port &= (~motor->pin1.pin);
+	*motor->pin2.port &= (~motor->pin2.pin);
+}
+
 void MOTOR_Init(void) {
 	for (uint8_t i=0; i<MOTOR_LAST; i++) {
 		*this.motors[i].pin1.ddr |= this.motors[i].pin1.pin;
 		*this.motors[i].pin2.ddr |= this.motors[i].pin2.pin;
+		this.motors[i].pwm = PWM_Register(&this.motors[i], pwm_StartHandler, pwm_CycleHandler, 1);
 	}
 }
 
 void MOTOR_Set(motor_id_t motor, reg_val_t value) {
-	*this.motors[motor].pin1.port &= (~this.motors[motor].pin1.pin);
-	*this.motors[motor].pin2.port &= (~this.motors[motor].pin2.pin);
+	motor_value_t val = value;
 
-	if (value == 1) {
-		*this.motors[motor].pin1.port |= ( this.motors[motor].pin1.pin);
-	} else if (value == 2){
-		*this.motors[motor].pin2.port |= ( this.motors[motor].pin2.pin);
+	if (val < 0) {
+		val *= -1;
 	}
+
+	struct motor* m = &this.motors[motor];
+	m->value = val;
+	PWM_Duty(m->pwm, val);
+	PWM_Update();
 }
 
 //reg_val_t MOTOR_Get(motor_id_t motor) {

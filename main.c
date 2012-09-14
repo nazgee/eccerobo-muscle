@@ -27,26 +27,26 @@ void CycleHandler ( void* userdata ) {
 int main(void)
 {
 	LED_Init();
-
 	MYMODBUS_Init(38400);
+	PWM_Init(PWM_PERIOD);
 
-	PWM_Init(25000);
-	PWM_Register((void*)_BV(0), StartHandler, CycleHandler, 2500);
-	PWM_Register((void*)_BV(1), StartHandler, CycleHandler, 5000);
-	PWM_Register((void*)_BV(2), StartHandler, CycleHandler, 10000);
-	PWM_Register((void*)_BV(3), StartHandler, CycleHandler, 15000);
-	PWM_Register((void*)_BV(4), StartHandler, CycleHandler, 20000);
-	PWM_Register((void*)_BV(5), StartHandler, CycleHandler, 22500);
-	PWM_Register((void*)_BV(6), StartHandler, CycleHandler, 24000);
-	PWM_Register((void*)_BV(7), StartHandler, CycleHandler, 24900);
-	PWM_Update();
+	sei();
 
-//	int skipper = 0;
+//	PWM_Register((void*)_BV(0), StartHandler, CycleHandler, 2000);
+//	PWM_Register((void*)_BV(1), StartHandler, CycleHandler, 2100);
+//	PWM_Register((void*)_BV(2), StartHandler, CycleHandler, 2200);
+//	PWM_Register((void*)_BV(3), StartHandler, CycleHandler, 2300);
+//	PWM_Register((void*)_BV(4), StartHandler, CycleHandler, 10000);
+//	PWM_Register((void*)_BV(5), StartHandler, CycleHandler, 20000);
+//	PWM_Register((void*)_BV(6), StartHandler, CycleHandler, 30000);
+	PWM_Register((void*)_BV(7), StartHandler, CycleHandler, 25000);
+	PWM_QuickUpdate();
+
 	while (1) {
-//		skipper++;
-//		if (skipper % 1000 == 0)
-//			LED_Toggle(LED_IDLE);
+//		_delay_ms(1);
+		LED_On(LED_MODBUS);
 		MYMODBUS_Manage();
+		LED_Off(LED_MODBUS);
 	}
 	return 0;
 }

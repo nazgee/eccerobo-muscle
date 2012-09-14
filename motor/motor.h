@@ -16,6 +16,7 @@ enum eMotor{
 	MOTOR_LAST
 };
 typedef enum eMotor motor_id_t;
+typedef int16_t motor_value_t;
 
 void MOTOR_Init(void);
 void MOTOR_Set(motor_id_t motor, reg_val_t value);

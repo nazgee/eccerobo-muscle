@@ -17,8 +17,8 @@
 #define LED_DUMMY5 _BV(5)
 #define LED_DUMMY4 _BV(4)
 #define LED_DUMMY3 _BV(3)
-#define LED_DUMMY2 _BV(2)
-#define LED_DUMMY1 _BV(1)
+#define LED_MODBUS _BV(2)
+#define LED_IRQ_ENABLED _BV(1)
 #define LED_IDLE _BV(0)
 
 void LED_Init(void);
