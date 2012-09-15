@@ -70,7 +70,7 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)1,
-				.duty = 10000,
+				.duty = 1000,
 				.onStart = pwm_StartHandler,
 				.onCycle = pwm_CycleHandler,
 			},

@@ -10,7 +10,6 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#include "uart.h"
 #include "mymodbus.h"
 #include "led.h"
 #include "pwm/pwm.h"
@@ -40,6 +39,7 @@ int main(void)
 
 	while (1) {
 		_delay_ms(10);
+		PWM_Duty(&pwm, pwm.duty+=30);
 		LED_Off(LED_IDLE);
 		MYMODBUS_Manage();
 		LED_On(LED_IDLE);

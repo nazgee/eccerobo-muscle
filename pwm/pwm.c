@@ -59,26 +59,30 @@ void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 	{
 		// insert channel at the end of the list
 		list_add_tail(&new_channel->node, &thiz.channels);
-		OCR1A = 3;	// XXX generate dummy interrupt soon
-		ENABLE_CLOCK();
+		if (list_is_singular(&thiz.channels)) {
+			OCR1A = 3;	// XXX generate dummy interrupt soon
+			ENABLE_CLOCK();
+		}
+	}
+}
+
+static inline void pwm_Sanitize(pwm_desc_ptr channel)
+{
+	if (channel->duty >= thiz.period) {
+		channel->duty = thiz.period - 2;
 	}
 }
 
 void PWM_Register(pwm_desc_ptr channel)
 {
-	if (channel->duty >= thiz.period) {
-		channel->duty = thiz.period - 2;
-	}
-
+	pwm_Sanitize(channel);
 	pwm_InsertSorted(channel);
 }
 
 void PWM_Duty(pwm_desc_ptr channel, duty_t duty)
 {
-	if (duty >= thiz.period) {
-		duty = thiz.period - 2;
-	}
-
+	channel->duty = duty;
+	pwm_Sanitize(channel);
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
 		list_del(&channel->node);
