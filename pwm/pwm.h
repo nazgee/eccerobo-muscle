@@ -12,9 +12,6 @@
 #include <stdint.h>
 #include "../misc/list.h"
 
-#define PWM_CHANNELS 10
-#define PWM_PERIOD 32767
-
 typedef void( *state_handler_t ) ( void* userdata );
 typedef uint16_t duty_t;
 typedef duty_t* duty_ptr;

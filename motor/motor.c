@@ -10,6 +10,7 @@
 #include "motor.h"
 #include "../led.h"
 #include "../pwm/pwm.h"
+#include "../defines.h"
 
 
 void pwm_StartHandler ( void* userdata );
@@ -51,11 +52,11 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)0,
-				.duty = 1000,
+				.duty = 0,
 				.onStart = pwm_StartHandler,
 				.onCycle = pwm_CycleHandler,
 			},
-			.value = 1
+			.value = 0
 		},
 		{
 			.pin1 = {
@@ -70,11 +71,11 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)1,
-				.duty = 1000,
+				.duty = 0,
 				.onStart = pwm_StartHandler,
 				.onCycle = pwm_CycleHandler,
 			},
-			.value = 1
+			.value = 0
 		}
 	}
 };
@@ -113,7 +114,7 @@ void MOTOR_Set(motor_id_t motor, reg_val_t value) {
 
 	struct motor* m = &this.motors[motor];
 	m->value = val_signed;
-	PWM_Duty(&m->pwm, value);
+	PWM_Duty(&m->pwm, value / PWM_FACTOR);
 }
 
 //reg_val_t MOTOR_Get(motor_id_t motor) {

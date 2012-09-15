@@ -27,8 +27,9 @@ static struct mypwm thiz =
 
 // prescaler = 0;
 #define CLEAR_TIMER_INTERRUPT() TIFR |= _BV(OCF1A)
-#define ENABLE_CLOCK() do { CLEAR_TIMER_INTERRUPT(); TCNT1 = 0; TCCR1B |= _BV(CS12)|_BV(CS12); } while(0)
+#define ENABLE_CLOCK() do { CLEAR_TIMER_INTERRUPT(); TCNT1 = 0; TCCR1B |= _BV(CS10)|_BV(CS10); } while(0)
 #define DISABLE_CLOCK() do { TCCR1B &= ~(_BV(CS12)|_BV(CS11)|_BV(CS10)); } while(0)
+#define CLOCKS_ISR_EXIT 10
 
 void PWM_Init(duty_t period)
 {
@@ -60,7 +61,7 @@ void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 		// insert channel at the end of the list
 		list_add_tail(&new_channel->node, &thiz.channels);
 		if (list_is_singular(&thiz.channels)) {
-			OCR1A = 3;	// XXX generate dummy interrupt soon
+			OCR1A = 4;	// XXX generate dummy interrupt soon
 			ENABLE_CLOCK();
 		}
 	}
@@ -138,5 +139,6 @@ ISR( TIMER1_COMPA_vect)
 		}
 	}
 
+	OCR1A += 1;
 	ENABLE_CLOCK();
 }
