@@ -17,13 +17,11 @@
 #include "motor/motor.h"
 
 /* ----------------------- Defines ------------------------------------------*/
-#define REG_INPUT_START 1000
-#define REG_INPUT_NREGS 4
+eMBErrorCode reg_Motor1( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
+eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
 
 /* ----------------------- Static variables ---------------------------------*/
 
-eMBErrorCode reg_Motor1( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
-eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode );
 
 static reg_t r1 = {
 		.id = 500,

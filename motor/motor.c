@@ -113,7 +113,7 @@ void MOTOR_Set(motor_id_t motor, reg_val_t value) {
 
 	struct motor* m = &this.motors[motor];
 	m->value = val_signed;
-	PWM_Duty(&m->pwm, value);
+	PWM_Duty(&m->pwm, value * 16);
 }
 
 //reg_val_t MOTOR_Get(motor_id_t motor) {
