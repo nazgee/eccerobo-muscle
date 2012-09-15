@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <mb.h>
 
-#define REGISTERS_NUMBER 10
+#define REGISTERS_NUMBER 2
 
 typedef struct reg reg_t;
 typedef reg_t* reg_ptr_t;
@@ -24,8 +24,6 @@ struct reg {
 	reg_val_t value;
 	regHandler handler;
 };
-//typedef struct reg reg_t;
-//typedef reg_t* reg_ptr_t;
 
 void REG_Register(reg_ptr_t reg2register);
 eMBErrorCode REG_Handle( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,

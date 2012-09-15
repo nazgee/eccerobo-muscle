@@ -39,12 +39,12 @@ static reg_t r2 = {
 eMBErrorCode reg_RW( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode ) {
 	switch (eMode) {
 		case MB_REG_READ: {
-			*pucRegBuffer++ = ( unsigned char )( reg->value >> 8 );
-			*pucRegBuffer++ = ( unsigned char )( reg->value & 0xFF );
+			*pucRegBuffer++ = ( UCHAR )( reg->value >> 8 );
+			*pucRegBuffer++ = ( UCHAR )( reg->value & 0xFF );
 		} break;
 		case MB_REG_WRITE:
 		default: {
-			reg->value = ((reg_val_t)pucRegBuffer[0] << 8) | pucRegBuffer[1];
+			reg->value = ((reg_val_t)pucRegBuffer[0] << 8) | (reg_val_t)pucRegBuffer[1];
 		} break;
 	}
 	return MB_ENOERR;

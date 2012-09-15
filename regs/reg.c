@@ -40,24 +40,29 @@ void REG_Register(reg_ptr_t reg2register) {
 
 
 
-eMBErrorCode REG_Handle( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
-                 eMBRegisterMode eMode ) {
-    eMBErrorCode    eStatus = MB_ENOERR;
-//    return eStatus;
+eMBErrorCode REG_Handle(UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
+		eMBRegisterMode eMode) {
+	eMBErrorCode eStatus = MB_ENOERR;
 
-    for (int i=0; i<usNRegs; i++) {
-    	reg_ptr_t* r = reg_Find(usAddress+i);
-    	if ((r == NULL) || ((*r) == NULL))
-    		return MB_ENOREG;
-    }
+	/*
+	 * Make sure that we have requested registers available
+	 */
+	for (int i = 0; i < usNRegs; i++) {
+		reg_ptr_t* r = reg_Find(usAddress + i);
+		if ((r == NULL) || ((*r) == NULL))
+			return MB_ENOREG;
+	}
 
-    for (int i=0; i<usNRegs; i++) {
-    	reg_ptr_t r = *reg_Find(usAddress+i);
-    	eMBErrorCode status = r->handler(r, pucRegBuffer + 2*i, eMode);
-    	if (status != MB_ENOERR) {
-    		eStatus = status;
-    	}
-    }
+	/*
+	 * handle registers access (now we know we can handle it)
+	 */
+	for (int i = 0; i < usNRegs; i++) {
+		reg_ptr_t r = *reg_Find(usAddress + i);
+		eMBErrorCode status = r->handler(r, pucRegBuffer + 2 * i, eMode);
+		if (status != MB_ENOERR) {
+			eStatus = status;
+		}
+	}
 
-    return eStatus;
+	return eStatus;
 }
