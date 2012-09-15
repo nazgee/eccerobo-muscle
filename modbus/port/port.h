@@ -32,17 +32,13 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include "../../led.h"
+#include "../../misc/types.h"
 
 
 /* ----------------------- Defines ------------------------------------------*/
 #define	INLINE                      inline
 #define PR_BEGIN_EXTERN_C           extern "C" {
 #define	PR_END_EXTERN_C             }
-
-//#define ENTER_CRITICAL_SECTION( )   do { cli(); LED_Off(LED_IRQ_ENABLED); _delay_us(100);} while(0)
-//#define EXIT_CRITICAL_SECTION( )    do { LED_On(LED_IRQ_ENABLED); sei(); _delay_us(100);} while(0)
-#define ENTER_CRITICAL_SECTION( )   do { cli(); } while(0)
-#define EXIT_CRITICAL_SECTION( )    do { sei(); } while(0)
 
 #define assert( x )
 

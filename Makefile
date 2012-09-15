@@ -145,7 +145,7 @@ JTAGICE_PORT=/dev/ttyUSB0
 HEXFORMAT=ihex
  
 # compiler
-CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) -std=c99 \
+CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -O$(OPTLEVEL) -std=gnu99 \
 	-DF_CPU=$(FREQ) \
 	-Wall -Wstrict-prototypes               \
 	-Wa,-ahlms=$(firstword                  \

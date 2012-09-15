@@ -10,6 +10,7 @@
 
 
 #include <stdint.h>
+#include "../misc/list.h"
 
 #define PWM_CHANNELS 10
 #define PWM_PERIOD 32767
@@ -19,19 +20,18 @@ typedef uint16_t duty_t;
 typedef duty_t* duty_ptr;
 
 typedef struct pwm_desc {
-	void* userdata;
-	duty_t duty;
-	state_handler_t onStart;
-	state_handler_t onCycle;
+	struct list_head	node;
+	void*			userdata;
+	duty_t			duty;
+	state_handler_t		onStart;
+	state_handler_t		onCycle;
 } pwm_desc_t;
 typedef pwm_desc_t* pwm_desc_ptr;
 
 
 void PWM_Init(duty_t period);
-uint8_t PWM_Register(void* userdata, state_handler_t onStart, state_handler_t onCycle, duty_t duty);
-void PWM_Duty(uint8_t id, duty_t duty);
-void PWM_Update(void);
-void PWM_QuickUpdate(void);
+void PWM_Register(pwm_desc_ptr channel);
+void PWM_Duty(pwm_desc_ptr channel, duty_t duty);
 
 
 

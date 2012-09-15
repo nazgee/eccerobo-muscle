@@ -27,13 +27,13 @@ eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eM
 
 static reg_t r1 = {
 		.id = 500,
-		.value = 69,
+		.value = 0,
 		.handler = reg_Motor1
 };
 
 static reg_t r2 = {
 		.id = 501,
-		.value = 666,
+		.value = 0,
 		.handler = reg_Motor2
 };
 /* ----------------------- Start implementation -----------------------------*/
