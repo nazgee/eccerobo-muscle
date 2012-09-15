@@ -18,7 +18,7 @@
 
 struct mypwm {
 	volatile duty_t period;
-	struct list_head channels;
+	volatile struct list_head channels;
 };
 
 static struct mypwm thiz =
@@ -26,8 +26,8 @@ static struct mypwm thiz =
 };
 
 // prescaler = 0;
-#define CLEAR_TIMER_INTERRUPT() TIFR |= _BV(OCIE1A)
-#define ENABLE_CLOCK() do { CLEAR_TIMER_INTERRUPT(); TCNT1 = 0; TCCR1B |= _BV(CS11); } while(0)
+#define CLEAR_TIMER_INTERRUPT() TIFR |= _BV(OCF1A)
+#define ENABLE_CLOCK() do { CLEAR_TIMER_INTERRUPT(); TCNT1 = 0; TCCR1B |= _BV(CS11)|_BV(CS11); } while(0)
 #define DISABLE_CLOCK() do { TCCR1B &= ~(_BV(CS12)|_BV(CS11)|_BV(CS10)); } while(0)
 
 void PWM_Init(duty_t period)

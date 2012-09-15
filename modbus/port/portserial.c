@@ -98,25 +98,10 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
             break;
     }
 
-#if defined (__AVR_ATmega168__)
-    UCSRC |= ucUCSRC;
-#elif defined (__AVR_ATmega169__)
-    UCSRC |= ucUCSRC;
-#elif defined (__AVR_ATmega8__)
+
     UCSRC = _BV( URSEL ) | ucUCSRC;
-#elif defined (__AVR_ATmega16__)
-    UCSRC = _BV( URSEL ) | ucUCSRC;
-#elif defined (__AVR_ATmega32__)
-    UCSRC = _BV( URSEL ) | ucUCSRC;
-#elif defined (__AVR_ATmega128__)
-    UCSRC |= ucUCSRC;
-#endif
 
     vMBPortSerialEnable( FALSE, FALSE );
-
-#ifdef RTS_ENABLE
-    RTS_INIT;
-#endif
     return TRUE;
 }
 

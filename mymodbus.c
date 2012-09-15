@@ -44,7 +44,8 @@ eMBErrorCode reg_RW( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode 
 		} break;
 		case MB_REG_WRITE:
 		default: {
-			reg->value = ((reg_val_t)pucRegBuffer[0] << 8) | (reg_val_t)pucRegBuffer[1];
+			reg->value = *pucRegBuffer++ << 8;
+			reg->value |= *pucRegBuffer++;
 		} break;
 	}
 	return MB_ENOERR;

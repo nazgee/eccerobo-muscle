@@ -73,7 +73,7 @@ FREQ=8000000UL
 # accept the same MCU name as avr-gcc (for example
 # for ATmega8s, avr-gcc expects 'atmega8' and 
 # avrdude requires 'm8')
-PROGRAMMER_MCU=$(MCU)
+PROGRAMMER_MCU=atmega16
  
 # Name of our project
 # (use a single word, e.g. 'myproject')
@@ -98,7 +98,7 @@ MBSRC = 	modbus/mb.c \
 			modbus/functions/mbfuncother.c \
 			modbus/functions/mbfuncdisc.c \
 			modbus/functions/mbutils.c 
-PRJSRC=main.c mymodbus.c led.c $(MBPORTSRC) $(MBSRC) \
+PRJSRC = $(MBPORTSRC) $(MBSRC) main.c mymodbus.c led.c \
 			regs/reg.c \
 			pwm/pwm.c \
 			motor/motor.c
