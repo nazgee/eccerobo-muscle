@@ -23,9 +23,8 @@ int main(void)
 
 	sei();
 
-
 	while (1) {
-//		_delay_ms(1);
+		_delay_ms(1);
 		LED_Off(LED_IDLE);
 		MYMODBUS_Manage();
 		LED_On(LED_IDLE);

@@ -35,9 +35,5 @@ struct list_head {
 	struct list_head *next, *prev;
 };
 
-//#define ENTER_CRITICAL_SECTION( )   do { cli(); LED_Off(LED_IRQ_ENABLED); _delay_us(100);} while(0)
-//#define EXIT_CRITICAL_SECTION( )    do { LED_On(LED_IRQ_ENABLED); sei(); _delay_us(100);} while(0)
-#define ENTER_CRITICAL_SECTION( )   do { cli(); } while(0)
-#define EXIT_CRITICAL_SECTION( )    do { sei(); } while(0)
 
 #endif /* TYPES_H_ */
