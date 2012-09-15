@@ -17,8 +17,8 @@
 #include <string.h>
 
 struct mypwm {
-	volatile duty_t period;
-	volatile struct list_head channels;
+	duty_t period;
+	struct list_head channels;
 };
 
 static struct mypwm thiz =
@@ -27,7 +27,7 @@ static struct mypwm thiz =
 
 // prescaler = 0;
 #define CLEAR_TIMER_INTERRUPT() TIFR |= _BV(OCF1A)
-#define ENABLE_CLOCK() do { CLEAR_TIMER_INTERRUPT(); TCNT1 = 0; TCCR1B |= _BV(CS11)|_BV(CS11); } while(0)
+#define ENABLE_CLOCK() do { CLEAR_TIMER_INTERRUPT(); TCNT1 = 0; TCCR1B |= _BV(CS12)|_BV(CS12); } while(0)
 #define DISABLE_CLOCK() do { TCCR1B &= ~(_BV(CS12)|_BV(CS11)|_BV(CS10)); } while(0)
 
 void PWM_Init(duty_t period)
@@ -66,13 +66,17 @@ void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 
 void PWM_Register(pwm_desc_ptr channel)
 {
+	if (channel->duty >= thiz.period) {
+		channel->duty = thiz.period - 2;
+	}
+
 	pwm_InsertSorted(channel);
 }
 
 void PWM_Duty(pwm_desc_ptr channel, duty_t duty)
 {
 	if (duty >= thiz.period) {
-		duty = thiz.period - 1;
+		duty = thiz.period - 2;
 	}
 
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -125,7 +129,8 @@ ISR( TIMER1_COMPA_vect)
 			pwm_desc_ptr next = list_entry(curr->node.next, pwm_desc_t, node);
 			OCR1A = next->duty - curr->duty;
 		} else {
-			OCR1A = thiz.period - curr->duty;
+			pwm_desc_ptr prev = list_entry(curr->node.prev, pwm_desc_t, node);
+			OCR1A = thiz.period - prev->duty;
 		}
 	}
 

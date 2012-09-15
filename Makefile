@@ -65,7 +65,7 @@
 # Name of target controller 
 # (e.g. 'at90s8515', see the available avr-gcc mmcu 
 # options for possible values)
-MCU=atmega16
+MCU=atmega16a
 FREQ=8000000UL
 # id to use with programmer
 # default: PROGRAMMER_MCU=$(MCU)
