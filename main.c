@@ -39,7 +39,7 @@ int main(void)
 	sei();
 
 	while (1) {
-		_delay_ms(3);
+		_delay_ms(1);
 //		PWM_Duty(&pwm, pwm.duty+=30);
 		LED_Off(LED_IDLE);
 		MYMODBUS_Manage();

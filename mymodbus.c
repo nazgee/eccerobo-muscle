@@ -22,7 +22,7 @@ eMBErrorCode reg_Motor2( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eM
 
 /* ----------------------- Static variables ---------------------------------*/
 
-
+volatile static uint16_t idles_counter = 0;
 static reg_t r1 = {
 		.id = 500,
 		.value = 0,
@@ -90,6 +90,12 @@ void MYMODBUS_Init(unsigned long baudrate)
 }
 
 void MYMODBUS_Manage(void) {
+	idles_counter++;
+	if (idles_counter > 1500) {
+		uint16_t val = 0;
+		reg_Motor1(&r1, (UCHAR*)&val, MB_REG_WRITE);
+		reg_Motor2(&r2, (UCHAR*)&val, MB_REG_WRITE);
+	}
 	(void) eMBPoll();
 }
 
@@ -103,6 +109,7 @@ eMBErrorCode
 eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
                  eMBRegisterMode eMode )
 {
+	idles_counter = 0;
 	return REG_Handle(pucRegBuffer, usAddress, usNRegs, eMode);
 }
 

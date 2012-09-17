@@ -59,12 +59,12 @@ struct module this = {
 			.value = 0
 		},
 		{
-			.pin1 = {
+			.pin2 = {
 				.pin = _BV(2),
 				.port = SFR2PTR(PORTB),
 				.ddr = SFR2PTR(DDRB),
 			},
-			.pin2 = {
+			.pin1 = {
 				.pin = _BV(3),
 				.port = SFR2PTR(PORTB),
 				.ddr = SFR2PTR(DDRB),
