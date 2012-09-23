@@ -65,11 +65,11 @@ eMBErrorCode reg_Motor( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMo
 }
 
 eMBErrorCode reg_MotorLeft( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode ) {
-	return reg_Motor(reg, pucRegBuffer, eMode, MOTOR_LEFT_FRONT);
+	return reg_Motor(reg, pucRegBuffer, eMode, MOTORS_LEFT);
 }
 
 eMBErrorCode reg_MotorRight( reg_ptr_t reg, UCHAR * pucRegBuffer, eMBRegisterMode eMode ) {
-	return reg_Motor(reg, pucRegBuffer, eMode, MOTOR_LEFT_BACK);
+	return reg_Motor(reg, pucRegBuffer, eMode, MOTORS_RIGHT);
 }
 
 void MYMODBUS_Init(unsigned long baudrate)
