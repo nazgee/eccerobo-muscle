@@ -13,8 +13,8 @@
 #include "../defines.h"
 
 
-void pwm_StartHandler ( void* userdata );
-void pwm_CycleHandler ( void* userdata );
+void pwm_OnDuty ( void* userdata );
+void pwm_OnPeriodFinished ( void* userdata );
 
 #define SFR2PTR(x) (uint8_t*)_SFR_ADDR(x)
 
@@ -32,7 +32,7 @@ struct motor {
 };
 
 struct module {
-	struct motor motors[MOTOR_LAST];
+	struct motor motors[MOTORS_NUMBER];
 };
 
 
@@ -40,21 +40,21 @@ struct module {
 struct module this = {
 	.motors = {
 		{
-			.pin1 = {
-				.pin = _BV(4),
-				.port = SFR2PTR(PORTD),
-				.ddr = SFR2PTR(DDRD),
-			},
 			.pin2 = {
-				.pin = _BV(5),
-				.port = SFR2PTR(PORTD),
-				.ddr = SFR2PTR(DDRD),
+				.pin = _BV(0),
+				.port = SFR2PTR(PORTB),
+				.ddr = SFR2PTR(DDRB),
+			},
+			.pin1 = {
+				.pin = _BV(1),
+				.port = SFR2PTR(PORTB),
+				.ddr = SFR2PTR(DDRB),
 			},
 			.pwm = {
 				.userdata = (void*)0,
 				.duty = 0,
-				.onStart = pwm_StartHandler,
-				.onCycle = pwm_CycleHandler,
+				.onDuty = pwm_OnDuty,
+				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
 			.value = 0
 		},
@@ -72,15 +72,53 @@ struct module this = {
 			.pwm = {
 				.userdata = (void*)1,
 				.duty = 0,
-				.onStart = pwm_StartHandler,
-				.onCycle = pwm_CycleHandler,
+				.onDuty = pwm_OnDuty,
+				.onPeriodFinished = pwm_OnPeriodFinished,
+			},
+			.value = 0
+		},
+		{
+			.pin2 = {
+				.pin = _BV(4),
+				.port = SFR2PTR(PORTB),
+				.ddr = SFR2PTR(DDRB),
+			},
+			.pin1 = {
+				.pin = _BV(5),
+				.port = SFR2PTR(PORTB),
+				.ddr = SFR2PTR(DDRB),
+			},
+			.pwm = {
+				.userdata = (void*)2,
+				.duty = 0,
+				.onDuty = pwm_OnDuty,
+				.onPeriodFinished = pwm_OnPeriodFinished,
+			},
+			.value = 0
+		},
+		{
+			.pin2 = {
+				.pin = _BV(6),
+				.port = SFR2PTR(PORTB),
+				.ddr = SFR2PTR(DDRB),
+			},
+			.pin1 = {
+				.pin = _BV(7),
+				.port = SFR2PTR(PORTB),
+				.ddr = SFR2PTR(DDRB),
+			},
+			.pwm = {
+				.userdata = (void*)3,
+				.duty = 0,
+				.onDuty = pwm_OnDuty,
+				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
 			.value = 0
 		}
 	}
 };
 
-void pwm_StartHandler ( void* userdata ) {
+void pwm_OnDuty ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
 	if (motor->value < 0) {
 		*motor->pin1.port |= ( motor->pin1.pin);
@@ -90,7 +128,7 @@ void pwm_StartHandler ( void* userdata ) {
 
 }
 
-void pwm_CycleHandler ( void* userdata ) {
+void pwm_OnPeriodFinished ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
 
 	*motor->pin1.port &= (~motor->pin1.pin);
@@ -98,23 +136,45 @@ void pwm_CycleHandler ( void* userdata ) {
 }
 
 void MOTOR_Init(void) {
-	for (uint8_t i=0; i<MOTOR_LAST; i++) {
+	for (uint8_t i=0; i<MOTORS_NUMBER; i++) {
 		*this.motors[i].pin1.ddr |= this.motors[i].pin1.pin;
 		*this.motors[i].pin2.ddr |= this.motors[i].pin2.pin;
 		PWM_Register(&this.motors[i].pwm);
 	}
 }
 
-void MOTOR_Set(motor_id_t motor, reg_val_t value) {
+static inline void motor_set(uint8_t id, reg_val_t value) {
 	motor_value_t val_signed = value;
 
 	if (val_signed < 0) {
 		value = val_signed * -1;
 	}
 
-	struct motor* m = &this.motors[motor];
+	struct motor* m = &this.motors[id];
 	m->value = val_signed;
 	PWM_Duty(&m->pwm, value / PWM_FACTOR);
+}
+
+void MOTOR_Set(motor_id_t motor, reg_val_t value) {
+	switch(motor) {
+	case MOTORS_LEFT:
+		motor_set(MOTOR_LEFT_FRONT & MOTORS_ID_MASK, value);
+		motor_set(MOTOR_LEFT_BACK & MOTORS_ID_MASK, value);
+		break;
+	case MOTORS_RIGHT:
+		motor_set(MOTOR_RIGHT_FRONT & MOTORS_ID_MASK, value);
+		motor_set(MOTOR_RIGHT_BACK & MOTORS_ID_MASK, value);
+		break;
+	case MOTORS_ALL:
+		motor_set(MOTOR_LEFT_FRONT & MOTORS_ID_MASK, value);
+		motor_set(MOTOR_LEFT_BACK & MOTORS_ID_MASK, value);
+		motor_set(MOTOR_RIGHT_FRONT & MOTORS_ID_MASK, value);
+		motor_set(MOTOR_RIGHT_BACK & MOTORS_ID_MASK, value);
+		break;
+	default:
+		motor_set(motor & MOTORS_ID_MASK, value);
+		break;
+	}
 }
 
 //reg_val_t MOTOR_Get(motor_id_t motor) {

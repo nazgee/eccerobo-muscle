@@ -11,9 +11,18 @@
 #include "../regs/reg.h"
 
 enum eMotor{
-	MOTOR1,
-	MOTOR2,
-	MOTOR_LAST
+	MOTORS_RIGHT = 0x80,
+	MOTORS_LEFT = 0x40,
+	MOTORS_ALL = MOTORS_RIGHT | MOTORS_LEFT,
+
+	MOTORS_ID_MASK = 0x0F,
+
+	MOTOR_RIGHT_FRONT = MOTORS_RIGHT | 0,
+	MOTOR_RIGHT_BACK = MOTORS_RIGHT | 1,
+	MOTOR_LEFT_FRONT = MOTORS_LEFT | 2,
+	MOTOR_LEFT_BACK = MOTORS_LEFT | 3,
+
+	MOTORS_NUMBER = 4
 };
 typedef enum eMotor motor_id_t;
 typedef int16_t motor_value_t;

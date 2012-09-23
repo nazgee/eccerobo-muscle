@@ -107,7 +107,7 @@ ISR( TIMER1_COMPA_vect)
 	if (end_of_cycle) {
 		end_of_cycle = 0;
 		list_for_each_entry(curr, head, node) {
-			curr->onStart(curr->userdata);
+			curr->onDuty(curr->userdata);
 		}
 
 		pwm_desc_ptr first = list_first_entry(head, pwm_desc_t, node);
@@ -116,7 +116,7 @@ ISR( TIMER1_COMPA_vect)
 		curr = list_prepare_entry(curr, &thiz.channels, node);
 		// call onCycle for all the channels with current timestamp
 		list_for_each_entry_continue(curr, head, node) {
-			curr->onCycle(curr->userdata);
+			curr->onPeriodFinished(curr->userdata);
 
 			if (list_is_last(&curr->node, head)) {
 				end_of_cycle = 1;

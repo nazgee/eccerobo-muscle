@@ -20,8 +20,8 @@ typedef struct pwm_desc {
 	struct list_head	node;
 	void*			userdata;
 	duty_t			duty;
-	state_handler_t		onStart;
-	state_handler_t		onCycle;
+	state_handler_t		onDuty;
+	state_handler_t		onPeriodFinished;
 } pwm_desc_t;
 typedef pwm_desc_t* pwm_desc_ptr;
 
