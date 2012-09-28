@@ -86,6 +86,11 @@ void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 void PWM_Register(pwm_desc_ptr channel)
 {
 	pwm_Sanitize(channel);
+	if (channel->phase) {
+		state_handler_t tmp = channel->onDuty;
+		channel->onDuty = channel->onPeriodFinished;
+		channel->onPeriodFinished = tmp;
+	}
 	pwm_InsertSorted(channel);
 }
 
