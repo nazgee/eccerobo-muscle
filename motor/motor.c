@@ -122,21 +122,38 @@ struct module this = {
 	}
 };
 
+/*
+ * This might not look obvious on first sight, but we are desperate to work in
+ * slow decay mode, due to (pressumably) better efficiency.
+ *
+ * DRV8833 PWM controlling
+ * IN1	IN2	FUNCTION
+ * PWM	0	Forward PWM, fast decay
+ * 1	PWM	Forward PWM, slow decay (better efficiency?)
+ * 0	PWM	Reverse PWM, fast decay
+ * PWM	1	Reverse PWM, slow decay (better efficiency?)
+ */
+
 void pwm_OnDuty ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
-	if (motor->value < 0) {
-		*motor->pin1.port |= ( motor->pin1.pin);
-	} else if (motor->value > 0){
-		*motor->pin2.port |= ( motor->pin2.pin);
-	}
 
+	if (motor->value < 0) {
+		*motor->pin2.port &= (~motor->pin2.pin);
+	} else if (motor->value > 0){
+		*motor->pin1.port &= (~motor->pin1.pin);
+	}
 }
 
 void pwm_OnPeriodFinished ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
 
-	*motor->pin1.port &= (~motor->pin1.pin);
-	*motor->pin2.port &= (~motor->pin2.pin);
+	if (motor->value != 0) {
+		*motor->pin2.port |= ( motor->pin2.pin);
+		*motor->pin1.port |= ( motor->pin1.pin);
+	} else {
+		*motor->pin1.port &= (~motor->pin1.pin);
+		*motor->pin2.port &= (~motor->pin2.pin);
+	}
 }
 
 void MOTOR_Init(void) {

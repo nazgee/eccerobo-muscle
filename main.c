@@ -28,11 +28,13 @@ int main(void)
 //	DDRB = 0xFF;
 	while (1) {
 		_delay_ms(2000);
-		for (int i = 0; i < 100; ++i) {
+		duty_t duty = 32700;
+		for (int i = 1; i < 100; ++i) {
 			LED_On(LED_IDLE);
-			MOTOR_Set(MOTORS_ALL, 25000);
+			duty *= -1;
+			MOTOR_Set(MOTORS_ALL, duty);
 			for (int j = 0; j <= i; ++j) {
-				_delay_ms(200);
+				_delay_ms(100);
 			}
 			MOTOR_Set(MOTORS_ALL, 0);
 			LED_Off(LED_IDLE);
