@@ -40,13 +40,29 @@ void PWM_Init(duty_t period)
 	TCCR1B = _BV(WGM12);	// set timer to CTC mode; WGM=4
 }
 
+static inline void pwm_Sanitize(pwm_desc_ptr channel)
+{
+	if (channel->duty >= thiz.period) {
+		channel->duty = thiz.period - 2;
+	}
+}
+
+static inline duty_t pwm_GetTickTimestamp(pwm_desc_ptr channel)
+{
+	if (channel->phase) {
+		return thiz.period - channel->duty;
+	} else {
+		return channel->duty;
+	}
+}
+
 void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 	struct list_head *i;
 	struct pwm_desc *channel_i;
 
 	list_for_each(i, &thiz.channels) {
 		channel_i = list_entry(i, struct pwm_desc, node);
-		if (new_channel->duty < channel_i->duty) {
+		if (pwm_GetTickTimestamp(new_channel) < pwm_GetTickTimestamp(channel_i)) {
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 			{
 				// insert channel before i
@@ -64,13 +80,6 @@ void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 			OCR1A = 4;	// XXX generate dummy interrupt soon
 			ENABLE_CLOCK();
 		}
-	}
-}
-
-static inline void pwm_Sanitize(pwm_desc_ptr channel)
-{
-	if (channel->duty >= thiz.period) {
-		channel->duty = thiz.period - 2;
 	}
 }
 
@@ -111,7 +120,7 @@ ISR( TIMER1_COMPA_vect)
 		}
 
 		pwm_desc_ptr first = list_first_entry(head, pwm_desc_t, node);
-		OCR1A = first->duty;
+		OCR1A = pwm_GetTickTimestamp(first);
 	} else {
 		curr = list_prepare_entry(curr, &thiz.channels, node);
 		// call onCycle for all the channels with current timestamp
@@ -121,10 +130,10 @@ ISR( TIMER1_COMPA_vect)
 			if (list_is_last(&curr->node, head)) {
 				end_of_cycle = 1;
 			} else {
-				// fall back if next entry have bigger duty-
+				// bail out if next entry has bigger timestamp-
 				// we'll have to wait for it till the next cycle
 				pwm_desc_ptr next = list_entry(curr->node.next, pwm_desc_t, node);
-				if (curr->duty < next->duty) {
+				if (pwm_GetTickTimestamp(curr) < pwm_GetTickTimestamp(next)) {
 					break;
 				}
 			}
@@ -132,7 +141,7 @@ ISR( TIMER1_COMPA_vect)
 
 		if (!end_of_cycle) {
 			pwm_desc_ptr next = list_entry(curr->node.next, pwm_desc_t, node);
-			OCR1A = next->duty - curr->duty;
+			OCR1A = pwm_GetTickTimestamp(next) - pwm_GetTickTimestamp(curr);
 		} else {
 			pwm_desc_ptr prev = list_entry(curr->node.prev, pwm_desc_t, node);
 			OCR1A = thiz.period - prev->duty;
