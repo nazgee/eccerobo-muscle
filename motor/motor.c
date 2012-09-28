@@ -53,6 +53,7 @@ struct module this = {
 			.pwm = {
 				.userdata = (void*)0,
 				.duty = 0,
+				.phase = 1,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
@@ -72,6 +73,7 @@ struct module this = {
 			.pwm = {
 				.userdata = (void*)1,
 				.duty = 0,
+				.phase = 0,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
@@ -91,6 +93,7 @@ struct module this = {
 			.pwm = {
 				.userdata = (void*)2,
 				.duty = 0,
+				.phase = 1,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
@@ -110,6 +113,7 @@ struct module this = {
 			.pwm = {
 				.userdata = (void*)3,
 				.duty = 0,
+				.phase = 0,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},

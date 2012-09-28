@@ -30,7 +30,7 @@ int main(void)
 		_delay_ms(2000);
 		for (int i = 0; i < 100; ++i) {
 			LED_On(LED_IDLE);
-			MOTOR_Set(MOTORS_ALL, 1);
+			MOTOR_Set(MOTORS_ALL, 15000);
 			for (int j = 0; j <= i; ++j) {
 				_delay_ms(200);
 			}
