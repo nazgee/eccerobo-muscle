@@ -25,22 +25,22 @@ int main(void)
 
 	sei();
 
-//	DDRB = 0xFF;
-	while (1) {
-		_delay_ms(2000);
-		duty_t duty = 32700;
-		for (int i = 1; i < 100; ++i) {
-			LED_On(LED_IDLE);
-			duty *= -1;
-			MOTOR_Set(MOTORS_ALL, duty);
-			for (int j = 0; j <= i; ++j) {
-				_delay_ms(100);
-			}
-			MOTOR_Set(MOTORS_ALL, 0);
-			LED_Off(LED_IDLE);
-			_delay_ms(1000);
-		}
-	}
+//	motors testing:
+//	while (1) {
+//		_delay_ms(1000);
+//		duty_t duty = 28000;
+//		for (int i = 1; i < 100; ++i) {
+//			LED_On(LED_IDLE);
+//			duty *= -1;
+//			MOTOR_Set(MOTORS_ALL, duty);
+//			for (int j = 0; j <= i; ++j) {
+//				_delay_ms(200);
+//			}
+//			MOTOR_Set(MOTORS_ALL, 0);
+//			LED_Off(LED_IDLE);
+//			_delay_ms(1000);
+//		}
+//	}
 
 	while (1) {
 		_delay_ms(1);

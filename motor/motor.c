@@ -36,7 +36,7 @@ struct module {
 };
 
 
-
+#define SOFTSTART 100
 struct module this = {
 	.motors = {
 		{
@@ -52,8 +52,9 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)0,
-				.duty = 0,
+				.duty_target = 0,
 				.phase = 1,
+				.duty_step = SOFTSTART,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
@@ -72,8 +73,9 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)1,
-				.duty = 0,
+				.duty_target = 0,
 				.phase = 0,
+				.duty_step = SOFTSTART,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
@@ -92,8 +94,9 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)2,
-				.duty = 0,
+				.duty_target = 0,
 				.phase = 1,
+				.duty_step = SOFTSTART,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
@@ -112,8 +115,9 @@ struct module this = {
 			},
 			.pwm = {
 				.userdata = (void*)3,
-				.duty = 0,
+				.duty_target = 0,
 				.phase = 0,
+				.duty_step = SOFTSTART,
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},

@@ -42,17 +42,26 @@ void PWM_Init(duty_t period)
 
 static inline void pwm_Sanitize(pwm_desc_ptr channel)
 {
-	if (channel->duty >= thiz.period) {
-		channel->duty = thiz.period - 2;
+	if (channel->duty_target >= thiz.period) {
+		channel->duty_target = thiz.period - 2;
 	}
 }
 
-static inline duty_t pwm_GetTickTimestamp(pwm_desc_ptr channel)
+static inline duty_t pwm_GetTargetTick(pwm_desc_ptr channel)
 {
 	if (channel->phase) {
-		return thiz.period - channel->duty;
+		return thiz.period - channel->duty_target;
 	} else {
-		return channel->duty;
+		return channel->duty_target;
+	}
+}
+
+static inline duty_t pwm_GetCurrentTick(pwm_desc_ptr channel)
+{
+	if (channel->phase) {
+		return thiz.period - channel->duty_current;
+	} else {
+		return channel->duty_current;
 	}
 }
 
@@ -62,7 +71,7 @@ void pwm_InsertSorted(pwm_desc_ptr new_channel) {
 
 	list_for_each(i, &thiz.channels) {
 		channel_i = list_entry(i, struct pwm_desc, node);
-		if (pwm_GetTickTimestamp(new_channel) < pwm_GetTickTimestamp(channel_i)) {
+		if (pwm_GetCurrentTick(new_channel) < pwm_GetCurrentTick(channel_i)) {
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 			{
 				// insert channel before i
@@ -91,17 +100,63 @@ void PWM_Register(pwm_desc_ptr channel)
 		channel->onDuty = channel->onPeriodFinished;
 		channel->onPeriodFinished = tmp;
 	}
+	if (channel->duty_step == 0) {
+		channel->duty_step = thiz.period;
+	}
 	pwm_InsertSorted(channel);
 }
 
 void PWM_Duty(pwm_desc_ptr channel, duty_t duty)
 {
-	channel->duty = duty;
+	channel->duty_target = duty;
 	pwm_Sanitize(channel);
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
 		list_del(&channel->node);
 		pwm_InsertSorted(channel);
+	}
+}
+/**
+ * @return != 0 if reordering is needed after advancing ticks
+ */
+static inline uint8_t pwm_AdvanceCurrentTick(pwm_desc_ptr channel)
+{
+	if (channel->duty_current == channel->duty_target) {
+		return 0;
+	}
+
+	if (channel->duty_current < channel->duty_target) {
+		duty_t diff = channel->duty_target - channel->duty_current;
+		duty_t step = diff < channel->duty_step ? diff : channel->duty_step;
+
+		// advance
+		channel->duty_current += step;
+	} else {
+		duty_t diff = channel->duty_current - channel->duty_target;
+		duty_t step = diff < channel->duty_step ? -diff : -channel->duty_step;
+
+		// advance
+		channel->duty_current += step;
+
+	}
+	return 1;
+}
+
+static inline void pwm_UpdateOrdering(void) {
+	pwm_desc_ptr cur;
+	pwm_desc_ptr tmp;
+	struct list_head* head = &thiz.channels;
+	LIST_HEAD(pending_update);
+
+	list_for_each_entry_safe(cur, tmp, head, node) {
+		if (pwm_AdvanceCurrentTick(cur)) {
+			list_move(&cur->node, &pending_update);
+		}
+	}
+
+	list_for_each_entry_safe(cur, tmp, &pending_update, node) {
+		list_del(&cur->node);
+		pwm_InsertSorted(cur);
 	}
 }
 
@@ -123,14 +178,18 @@ ISR( TIMER1_COMPA_vect)
 		list_for_each_entry(curr, head, node) {
 			curr->onDuty(curr->userdata);
 		}
+		pwm_UpdateOrdering();
 
+		curr = NULL;
 		pwm_desc_ptr first = list_first_entry(head, pwm_desc_t, node);
-		OCR1A = pwm_GetTickTimestamp(first);
+		OCR1A = pwm_GetCurrentTick(first);
 	} else {
 		curr = list_prepare_entry(curr, &thiz.channels, node);
 		// call onCycle for all the channels with current timestamp
+		duty_t current_timestamp = 0;
 		list_for_each_entry_continue(curr, head, node) {
 			curr->onPeriodFinished(curr->userdata);
+			current_timestamp = pwm_GetCurrentTick(curr);
 
 			if (list_is_last(&curr->node, head)) {
 				end_of_cycle = 1;
@@ -138,18 +197,18 @@ ISR( TIMER1_COMPA_vect)
 				// bail out if next entry has bigger timestamp-
 				// we'll have to wait for it till the next cycle
 				pwm_desc_ptr next = list_entry(curr->node.next, pwm_desc_t, node);
-				if (pwm_GetTickTimestamp(curr) < pwm_GetTickTimestamp(next)) {
+				if (current_timestamp < pwm_GetCurrentTick(next)) {
 					break;
 				}
 			}
+
 		}
 
 		if (!end_of_cycle) {
 			pwm_desc_ptr next = list_entry(curr->node.next, pwm_desc_t, node);
-			OCR1A = pwm_GetTickTimestamp(next) - pwm_GetTickTimestamp(curr);
+			OCR1A = pwm_GetCurrentTick(next) - current_timestamp;
 		} else {
-			pwm_desc_ptr prev = list_entry(curr->node.prev, pwm_desc_t, node);
-			OCR1A = thiz.period - prev->duty;
+			OCR1A = thiz.period - current_timestamp;
 		}
 	}
 

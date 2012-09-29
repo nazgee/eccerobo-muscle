@@ -21,7 +21,9 @@ typedef struct pwm_desc {
 	void*			userdata;
 	state_handler_t		onDuty;
 	state_handler_t		onPeriodFinished;
-	duty_t			duty;
+	duty_t			duty_target;
+	duty_t			duty_current;
+	duty_t			duty_step;
 	uint8_t			phase;
 } pwm_desc_t;
 typedef pwm_desc_t* pwm_desc_ptr;
