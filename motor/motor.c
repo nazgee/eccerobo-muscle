@@ -36,7 +36,7 @@ struct module {
 };
 
 
-#define SOFTSTART 75
+#define SOFTSTART 30
 struct module this = {
 	.motors = {
 		{
@@ -138,13 +138,23 @@ struct module this = {
  * PWM	1	Reverse PWM, slow decay (better efficiency?)
  */
 
+#define LEDHACK
 void pwm_OnDuty ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
 
 	if (motor->value < 0) {
 		*motor->pin2.port &= (~motor->pin2.pin);
+#ifdef LEDHACK
+		LED_PORT |= (motor->pin2.pin);
+#endif
 	} else if (motor->value > 0){
 		*motor->pin1.port &= (~motor->pin1.pin);
+#ifdef LEDHACK
+		LED_PORT |= (motor->pin1.pin);
+#endif
+	} else {
+		LED_PORT |= (motor->pin2.pin);
+		LED_PORT |= (motor->pin1.pin);
 	}
 }
 
@@ -154,9 +164,19 @@ void pwm_OnPeriodFinished ( void* userdata ) {
 	if (motor->value != 0) {
 		*motor->pin2.port |= ( motor->pin2.pin);
 		*motor->pin1.port |= ( motor->pin1.pin);
+#ifdef LEDHACK
+//		LED_PORT |= ( motor->pin2.pin);
+//		LED_PORT |= ( motor->pin1.pin);
+		LED_PORT &= (~motor->pin2.pin);
+		LED_PORT &= (~motor->pin1.pin);
+#endif
 	} else {
 		*motor->pin1.port &= (~motor->pin1.pin);
 		*motor->pin2.port &= (~motor->pin2.pin);
+#ifdef LEDHACK
+		LED_PORT &= (~motor->pin2.pin);
+		LED_PORT &= (~motor->pin1.pin);
+#endif
 	}
 }
 

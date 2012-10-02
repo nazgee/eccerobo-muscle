@@ -47,15 +47,6 @@ static inline void pwm_Sanitize(pwm_desc_ptr channel)
 	}
 }
 
-static inline duty_t pwm_GetTargetTick(pwm_desc_ptr channel)
-{
-	if (channel->phase) {
-		return thiz.period - channel->duty_target;
-	} else {
-		return channel->duty_target;
-	}
-}
-
 static inline duty_t pwm_GetCurrentTick(pwm_desc_ptr channel)
 {
 	if (channel->phase) {
@@ -108,10 +99,10 @@ void PWM_Register(pwm_desc_ptr channel)
 
 void PWM_Duty(pwm_desc_ptr channel, duty_t duty)
 {
-	channel->duty_target = duty;
-	pwm_Sanitize(channel);
 	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
 	{
+		pwm_Sanitize(channel);
+		channel->duty_target = duty;
 		list_del(&channel->node);
 		pwm_InsertSorted(channel);
 	}
