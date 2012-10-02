@@ -36,7 +36,7 @@ struct module {
 };
 
 
-#define SOFTSTART 100
+#define SOFTSTART 75
 struct module this = {
 	.motors = {
 		{

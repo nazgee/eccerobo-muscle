@@ -66,7 +66,7 @@
 # (e.g. 'at90s8515', see the available avr-gcc mmcu 
 # options for possible values)
 MCU=atmega16a
-FREQ=8000000UL
+FREQ=7372800UL
 # id to use with programmer
 # default: PROGRAMMER_MCU=$(MCU)
 # In case the programer used, e.g avrdude, doesn't

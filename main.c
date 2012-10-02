@@ -21,7 +21,7 @@ int main(void)
 {
 	LED_Init();
 	PWM_Init(PWM_PERIOD);
-	MYMODBUS_Init(38400);
+	MYMODBUS_Init(57600);
 
 	sei();
 
@@ -43,7 +43,7 @@ int main(void)
 //	}
 
 	while (1) {
-		_delay_ms(1);
+		_delay_us(100);
 		LED_Off(LED_IDLE);
 		MYMODBUS_Manage();
 		LED_On(LED_IDLE);
