@@ -49,11 +49,34 @@ static inline void pwm_Sanitize(pwm_desc_ptr channel)
 
 static inline duty_t pwm_GetCurrentTick(pwm_desc_ptr channel)
 {
+	duty_t abs_tick = channel->duty_current > 0 ?
+			channel->duty_current : -channel->duty_current;
+
 	if (channel->phase) {
-		return thiz.period - channel->duty_current;
+		return thiz.period - abs_tick;
 	} else {
-		return channel->duty_current;
+		return abs_tick;
 	}
+}
+
+duty_t PWM_GetCurrentDuty(pwm_desc_ptr channel)
+{
+	duty_t val;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		val = channel->duty_current;
+	}
+	return val;
+}
+
+duty_t PWM_GetTargetDuty(pwm_desc_ptr channel)
+{
+	duty_t val;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+	{
+		val = channel->duty_target;
+	}
+	return val;
 }
 
 void pwm_InsertSorted(pwm_desc_ptr new_channel) {
@@ -116,20 +139,16 @@ static inline uint8_t pwm_AdvanceCurrentTick(pwm_desc_ptr channel)
 		return 0;
 	}
 
-	if (channel->duty_current < channel->duty_target) {
-		duty_t diff = channel->duty_target - channel->duty_current;
-		duty_t step = diff < channel->duty_step ? diff : channel->duty_step;
-
-		// advance
-		channel->duty_current += step;
+	duty_t diff = channel->duty_target - channel->duty_current;
+	duty_t step;
+	if (diff > 0) {
+		step = diff < channel->duty_step ? diff : channel->duty_step;
 	} else {
-		duty_t diff = channel->duty_current - channel->duty_target;
-		duty_t step = diff < channel->duty_step ? -diff : -channel->duty_step;
-
-		// advance
-		channel->duty_current += step;
-
+		step = diff > -channel->duty_step ? diff : -channel->duty_step;
 	}
+
+	channel->duty_current += step;
+
 	return 1;
 }
 

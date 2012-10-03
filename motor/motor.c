@@ -28,7 +28,6 @@ struct motor {
 	struct motor_pin pin1;
 	struct motor_pin pin2;
 	pwm_desc_t pwm;
-	motor_value_t value;
 };
 
 struct module {
@@ -36,7 +35,7 @@ struct module {
 };
 
 
-#define SOFTSTART 30
+#define SOFTSTART 10
 struct module this = {
 	.motors = {
 		{
@@ -58,7 +57,6 @@ struct module this = {
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
-			.value = 0
 		},
 		{
 			.pin2 = {
@@ -79,7 +77,6 @@ struct module this = {
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
-			.value = 0
 		},
 		{
 			.pin2 = {
@@ -100,7 +97,6 @@ struct module this = {
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
-			.value = 0
 		},
 		{
 			.pin2 = {
@@ -121,7 +117,6 @@ struct module this = {
 				.onDuty = pwm_OnDuty,
 				.onPeriodFinished = pwm_OnPeriodFinished,
 			},
-			.value = 0
 		}
 	}
 };
@@ -142,12 +137,13 @@ struct module this = {
 void pwm_OnDuty ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
 
-	if (motor->value < 0) {
+	duty_t val = PWM_GetCurrentDuty(&motor->pwm);
+	if (val < 0) {
 		*motor->pin2.port &= (~motor->pin2.pin);
 #ifdef LEDHACK
 		LED_PORT |= (motor->pin2.pin);
 #endif
-	} else if (motor->value > 0){
+	} else if (val > 0){
 		*motor->pin1.port &= (~motor->pin1.pin);
 #ifdef LEDHACK
 		LED_PORT |= (motor->pin1.pin);
@@ -161,7 +157,8 @@ void pwm_OnDuty ( void* userdata ) {
 void pwm_OnPeriodFinished ( void* userdata ) {
 	struct motor* motor = &this.motors[(intptr_t)userdata];
 
-	if (motor->value != 0) {
+	duty_t val = PWM_GetCurrentDuty(&motor->pwm);
+	if (val != 0) {
 		*motor->pin2.port |= ( motor->pin2.pin);
 		*motor->pin1.port |= ( motor->pin1.pin);
 #ifdef LEDHACK
@@ -191,13 +188,8 @@ void MOTOR_Init(void) {
 static inline void motor_set(uint8_t id, reg_val_t value) {
 	motor_value_t val_signed = value;
 
-	if (val_signed < 0) {
-		value = val_signed * -1;
-	}
-
 	struct motor* m = &this.motors[id];
-	m->value = val_signed;
-	PWM_Duty(&m->pwm, value / PWM_FACTOR);
+	PWM_Duty(&m->pwm, val_signed / PWM_FACTOR);
 }
 
 void MOTOR_Set(motor_id_t motor, reg_val_t value) {

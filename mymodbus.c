@@ -91,7 +91,7 @@ void MYMODBUS_Init(unsigned long baudrate)
 
 void MYMODBUS_Manage(void) {
 	idles_counter++;
-	if (idles_counter > 15000) {
+	if (idles_counter > 1500) {
 		idles_counter = 0;
 		uint16_t val = 0;
 		reg_RW(&r1, (UCHAR*)&val, MB_REG_WRITE);

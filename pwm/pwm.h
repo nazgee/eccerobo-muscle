@@ -13,7 +13,7 @@
 #include "../misc/list.h"
 
 typedef void( *state_handler_t ) ( void* userdata );
-typedef uint16_t duty_t;
+typedef int16_t duty_t;
 typedef duty_t* duty_ptr;
 
 typedef struct pwm_desc {
@@ -31,6 +31,8 @@ typedef pwm_desc_t* pwm_desc_ptr;
 
 void PWM_Init(duty_t period);
 void PWM_Register(pwm_desc_ptr channel);
+duty_t PWM_GetCurrentDuty(pwm_desc_ptr channel);
+duty_t PWM_GetTargetDuty(pwm_desc_ptr channel);
 void PWM_Duty(pwm_desc_ptr channel, duty_t duty);
 
 

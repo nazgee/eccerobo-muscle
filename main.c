@@ -43,10 +43,8 @@ int main(void)
 //	}
 
 	while (1) {
-		_delay_us(100);
-		LED_Off(LED_IDLE);
+		_delay_ms(1);
 		MYMODBUS_Manage();
-		LED_On(LED_IDLE);
 	}
 	return 0;
 }
