@@ -21,7 +21,7 @@ int main(void)
 {
 	LED_Init();
 	PWM_Init(PWM_PERIOD);
-	MYMODBUS_Init(57600);
+	MYMODBUS_Init(38400);
 
 	sei();
 
